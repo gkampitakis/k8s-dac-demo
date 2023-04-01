@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-server
+  namespace: webhook-demo
+  labels:
+    app: webhook-server
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: webhook-server
+  template:
+    metadata:
+      labels:
+        app: webhook-server
+    spec:
+      containers:
+        - name: server
+          # local setup for testing
+          image: localhost:5000/webhook:latest
+          imagePullPolicy: Always
+          env:
+            - name: WEBHOOK_PORT
+              value: "8443"
+            - name: ENV
+              value: prod
+            - name: TLS_DIR
+              value: /run/secrets/tls
+          ports:
+            - containerPort: 8443
+              name: webhook-api
+          volumeMounts:
+            - name: webhook-tls-certs
+              mountPath: /run/secrets/tls
+              readOnly: true
+      volumes:
+        - name: webhook-tls-certs
+          secret:
+            secretName: webhook-server-tls

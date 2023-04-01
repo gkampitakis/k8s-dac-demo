@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-pod
+  namespace: webhook-demo
+spec:
+  restartPolicy: Always
+  containers:
+    - name: busybox
+      image: busybox
+      command: ["sleep", "infinity"]
