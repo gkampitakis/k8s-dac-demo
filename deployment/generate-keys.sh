@@ -46,7 +46,7 @@ DNS.1 = webhook-server.webhook-demo.svc
 EOF
 
 
-# Generate the CA cert and private key
+# Generate a self-signed CA (Certificate Authority) cert and private key
 openssl req -nodes -new -x509 -keyout ca.key -out ca.crt -subj "/CN=Admission Controller Webhook Demo CA"
 # Generate the private key for the webhook server
 openssl genrsa -out webhook-server-tls.key 2048

@@ -1,5 +1,5 @@
-.PHONY: install-tools lint test test-verbose format help build-image
-.SILENT: install-tools lint test test-verbose format help build-image
+.PHONY: install-tools lint test test-verbose format help docker-image-local deploy cleanup
+.SILENT: install-tools lint test test-verbose format help docker-image-local deploy cleanup
 
 help:
 	grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -24,10 +24,10 @@ test-verbose: ## Run tests with verbose output
 
 docker-image-local: ## Build Docker Image for local minikube setup
 	docker build . -t localhst:5000/webhook:latest
-	docker push localhst:5000/webhook:latest
+	docker push localhost:5000/webhook:latest
 
-deploy:
+deploy: ## Deploy all webhook components
 	./deploy.sh
 
-cleanup:
+cleanup: ## Clean up all webhook components
 	./cleanup.sh
