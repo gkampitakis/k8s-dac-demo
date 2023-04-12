@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	v1 "k8s.io/api/admission/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -26,7 +27,8 @@ var (
 
 		return append(def, strings.Split(v, ",")...)
 	}()
-	tlsDir = os.Getenv("TLS_DIR")
+	tlsDir          = os.Getenv("TLS_DIR")
+	allowScheduling = GetEnvDefault("ALLOW_SCHEDULING", "false") == "true"
 )
 
 const (
@@ -113,8 +115,30 @@ func validateHandler() http.Handler {
 		}
 
 		if !skipNamespace(review.Request.Namespace) {
-			// NOTE: how we distinguish controllers
-			log.Println(review)
+			raw := review.Request.Object.Raw
+			pod := corev1.Pod{}
+
+			err := json.Unmarshal(raw, &pod)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write(responseBody("could not unmarshal pod spec: %v", err))
+				return
+			}
+
+			if _, exists := pod.Labels["team"]; !exists {
+				admissionReviewResponse.Response.Allowed = allowScheduling
+				if allowScheduling {
+					admissionReviewResponse.Response.Warnings = []string{
+						"Team label not set on pod",
+					}
+				}
+				admissionReviewResponse.Response.Result = &metav1.Status{
+					Status:  "Failure",
+					Message: "Team label not set on pod",
+				}
+
+				log.Printf("Team label not set on pod: %s\n", pod.Name)
+			}
 		}
 
 		response, err := json.Marshal(admissionReviewResponse)

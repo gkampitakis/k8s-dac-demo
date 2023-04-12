@@ -28,6 +28,8 @@ spec:
           env:
             - name: WEBHOOK_PORT
               value: "8443"
+            - name: SKIP_NAMESPACE
+              value: "webhook-demo"
             - name: ENV
               value: prod
             - name: TLS_DIR

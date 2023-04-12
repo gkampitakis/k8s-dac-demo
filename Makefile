@@ -23,7 +23,7 @@ test-verbose: ## Run tests with verbose output
 	go test -race -count=1 -v -cover ./...
 
 docker-image-local: ## Build Docker Image for local minikube setup
-	docker build . -t localhst:5000/webhook:latest
+	docker build . -t localhost:5000/webhook:latest
 	docker push localhost:5000/webhook:latest
 
 deploy: ## Deploy all webhook components
