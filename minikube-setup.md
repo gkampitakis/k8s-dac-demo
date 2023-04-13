@@ -62,3 +62,28 @@ NAME                              READY   STATUS    RESTARTS   AGE
 webhook-server-79c79b5877-d624n   1/1     Running   0          11m
 webhook-server-79c79b5877-dpf4b   1/1     Running   0          11m
 ```
+
+## Experimenting and applying changes
+
+For experimenting/changing the [webhook-server](./webhook-server/main.go), you can
+build a new docker image and push it on your local registry with
+
+```sh
+make docker-image-local
+```
+
+Then you need to restart the k8s deployment for pulling the new changes with
+
+```sh
+kubectl rollout restart deploy/webhook-server
+```
+
+On the other hand for changing the [ValidatingWebhookConfiguration](./deployment/webhookConfig.yaml.tpl) you need to re-deploy.
+
+You can do that with
+
+```sh
+make clean
+
+make deploy
+```

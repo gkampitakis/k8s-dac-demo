@@ -4,6 +4,7 @@ metadata:
   name: webhook-demo
 webhooks:
   - name: webhook-server.webhook-demo.svc
+    failurePolicy: Ignore # or Fail more information at https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
     sideEffects: None
     admissionReviewVersions: ["v1", "v1beta1"]
     clientConfig:
@@ -13,9 +14,8 @@ webhooks:
         path: "/validate"
       caBundle: ${CA_PEM_B64}
     rules:
-      # TODO: failure policy
-      # TODO: namespaces to skip
       - operations: ["CREATE"]
         apiGroups: [""]
         apiVersions: ["v1"]
         resources: ["pods"]
+        scope: "Namespaced"

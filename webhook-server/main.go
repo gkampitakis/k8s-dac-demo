@@ -17,7 +17,6 @@ import (
 
 var (
 	port                = GetEnvDefault("WEBHOOK_PORT", "8443")
-	env                 = GetEnvDefault("ENV", "dev")
 	skippableNamespaces = func() []string {
 		def := []string{metav1.NamespacePublic, metav1.NamespaceSystem}
 		v := os.Getenv("SKIP_NAMESPACE")
@@ -46,21 +45,15 @@ func main() {
 		Addr:    ":" + port,
 	}
 
-	log.Println("listening")
-
-	// TODO: add graceful shutdown
-	// TODO: add logger
-	// TODO: unit testing
-	if env == "dev" {
-		log.Fatal(server.ListenAndServe())
-		return
-	}
+	log.Println("webhook server is listening")
 
 	log.Fatal(server.ListenAndServeTLS(certFile, keyFile))
 }
 
 func validateHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("incoming request...")
+
 		// only POST method is supported
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
@@ -90,7 +83,6 @@ func validateHandler() http.Handler {
 		}
 
 		var review v1.AdmissionReview
-
 		err = json.Unmarshal(body, &review)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -154,7 +146,10 @@ func validateHandler() http.Handler {
 }
 
 func responseBody(format string, args ...interface{}) []byte {
-	return []byte(fmt.Sprintf(format, args...))
+	msg := fmt.Sprintf(format, args...)
+	log.Println("[ERROR]: " + msg)
+
+	return []byte(msg)
 }
 
 func GetEnvDefault(key, def string) string {
