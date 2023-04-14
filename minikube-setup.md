@@ -63,6 +63,16 @@ webhook-server-79c79b5877-d624n   1/1     Running   0          11m
 webhook-server-79c79b5877-dpf4b   1/1     Running   0          11m
 ```
 
+Then you can try and schedule the [busy-box.yaml](./deployment/busy-box.yaml) and if everything works correctly it should fail scheduling with error
+
+```sh
+kubectl apply -f deployment/busy-box.yaml
+
+Error from server: error when creating "deployment/busy-box.yaml": admission webhook "webhook-server.webhook-demo.svc" denied the request: Team label not set on pod
+```
+
+You can add a team label in the pod spec and try again successfully.
+
 ## Experimenting and applying changes
 
 For experimenting/changing the [webhook-server](./webhook-server/main.go), you can

@@ -32,6 +32,9 @@ echo "Generating TLS keys ..."
 echo "Creating Kubernetes objects ..."
 kubectl create namespace webhook-demo
 
+# creating dev namespace for scheduling busy-box pods
+kubectl create namespace dev
+
 # Create the TLS secret for the generated keys.
 kubectl -n webhook-demo create secret tls webhook-server-tls \
     --cert "${keydir}/webhook-server-tls.crt" \

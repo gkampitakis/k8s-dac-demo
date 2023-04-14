@@ -141,6 +141,7 @@ func validateHandler() http.Handler {
 			return
 		}
 
+		w.WriteHeader(http.StatusOK)
 		w.Write(response)
 	})
 }
